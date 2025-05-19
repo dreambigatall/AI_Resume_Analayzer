@@ -1,61 +1,70 @@
+
 // src/pages/LoginPage.tsx
 import { useNavigate, Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { supabase } from '@/lib/supabaseClient';
-// import { LoginSchema, LoginFormData } from '@/lib/validators';
-import { LoginSchema,type LoginFormData } from '@/lib/validators';
-import { Button } from "@/components/ui/button";
-// import { Input } from "@/components/ui/input";
-import { Input } from '../components/ui/input';
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-// import { useToast } from "@/components/ui/use-toast"; // npx shadcn-ui@latest add use-toast
-import { toast } from 'sonner';
 import { useState } from 'react';
-import { useAuth } from '@/contexts/AuthContext'; // To redirect if already logged in
+import { supabase } from '@/lib/supabaseClient';
+import { LoginSchema, type LoginFormData } from '@/lib/validators';
+import { useAuth } from '@/contexts/AuthContext';
+import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 
-const LoginPage = () => {
+// Spinner component
+const Spinner = () => (
+  <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+);
+
+export default function LoginPage() {
   const navigate = useNavigate();
-  // const { toast } = useToast();
+  const { session } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
-  const { session } = useAuth(); // Get session from context
+  const [showPassword, setShowPassword] = useState(false);
 
-  const { register, handleSubmit, formState: { errors } } = useForm<LoginFormData>({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormData>({
     resolver: zodResolver(LoginSchema),
+    defaultValues: { email: '', password: '' },
   });
 
-  // Redirect if user is already logged in
   if (session) {
     navigate('/');
-    return null; // or a loading indicator
+    return null;
   }
 
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
     try {
-      const { error, data: authData } = await supabase.auth.signInWithPassword({
+      const { error } = await supabase.auth.signInWithPassword({
         email: data.email,
         password: data.password,
       });
-      
-      if (error) {
-        toast.error("Login Failed", {
-          description: error.message || "Invalid credentials."
-        });
-      } else {
-        // Wait for session to be set
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session) {
-          toast.success("Login Successful", {
-            description: "Welcome back!"
-          });
-          navigate('/');
-        }
-      }
-    } catch (err) {
-      toast.error("An Unexpected Error Occurred", {
-        description: "Please try again later."
+      if (error) throw error;
+
+      const {
+        data: { session: newSession },
+      } = await supabase.auth.getSession();
+      if (!newSession) throw new Error('No session returned');
+
+      toast.success('Welcome back!', {
+        description: 'You are now logged in.',
+      });
+      navigate('/');
+    } catch (err: any) {
+      toast.error('Login Failed', {
+        description: err.message || 'Invalid credentials.',
       });
     } finally {
       setIsLoading(false);
@@ -63,83 +72,186 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 px-4">
-      <Card className="w-full max-w-md shadow-lg border-0">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold text-center">Welcome back</CardTitle>
-          <CardDescription className="text-center">
-            Enter your credentials to access your account
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-teal-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700 p-6">
+      <div className="max-w-md w-full bg-white/80 dark:bg-gray-900/80 backdrop-blur-md rounded-2xl p-8 shadow-xl border border-gray-200 dark:border-gray-700">
+        <CardHeader className="text-center mb-6">
+          <CardTitle className="text-4xl font-bold text-indigo-600 dark:text-teal-300">
+            Welcome Back
+          </CardTitle>
+          <CardDescription className="text-gray-600 dark:text-gray-400">
+            Sign in to manage your job posts and candidates.
           </CardDescription>
         </CardHeader>
+
         <CardContent>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email" className="text-sm font-medium">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+            {/* Email */}
+            <div>
+              <Label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >
                 Email
               </Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="name@example.com"
-                className="h-11"
+                placeholder="you@company.com"
+                autoFocus
+                className={`mt-1 h-12 px-4 bg-white dark:bg-gray-800 placeholder-gray-400 dark:placeholder-gray-500 border rounded-lg shadow-sm ${
+                  errors.email
+                    ? 'border-red-500 focus-visible:ring-red-500'
+                    : 'border-gray-300 dark:border-gray-600 focus-visible:ring-indigo-500 dark:focus-visible:ring-teal-400'
+                }`}
                 {...register('email')}
               />
               {errors.email && (
-                <p className="text-sm text-red-500 mt-1">{errors.email.message}</p>
+                <p className="mt-1 text-sm text-red-500 flex items-center gap-1">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  {errors.email.message}
+                </p>
               )}
             </div>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="password" className="text-sm font-medium">
-                  Password
-                </Label>
-                <Link
-                  to="/forgot-password"
-                  className="text-sm text-blue-600 hover:text-blue-500 dark:text-blue-400"
+
+            {/* Password with toggle */}
+            <div>
+              <Label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >
+                Password
+              </Label>
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="••••••••"
+                  className={`mt-1 h-12 px-4 pr-10 w-full bg-white dark:bg-gray-800 placeholder-gray-400 dark:placeholder-gray-500 border rounded-lg shadow-sm ${
+                    errors.password
+                      ? 'border-red-500 focus-visible:ring-red-500'
+                      : 'border-gray-300 dark:border-gray-600 focus-visible:ring-indigo-500 dark:focus-visible:ring-teal-400'
+                  }`}
+                  {...register('password')}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((s) => !s)}
+                  className="absolute top-1/2 right-3 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none"
                 >
-                  Forgot password?
-                </Link>
+                  {showPassword ? (
+                    /* Eye open icon */
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                      />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                      />
+                    </svg>
+                  ) : (
+                    /* Eye closed icon */
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a10.055 10.055 0 013.158-4.415m3.3-2.01A9.973 9.973 0 0112 5c4.477 0 8.268 2.943 9.542 7a9.978 9.978 0 01-1.249 2.527M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                      />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M3 3l18 18"
+                      />
+                    </svg>
+                  )}
+                </button>
               </div>
-              <Input
-                id="password"
-                type="password"
-                className="h-11"
-                {...register('password')}
-              />
               {errors.password && (
-                <p className="text-sm text-red-500 mt-1">{errors.password.message}</p>
+                <p className="mt-1 text-sm text-red-500 flex items-center gap-1">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  {errors.password.message}
+                </p>
               )}
             </div>
+
+            {/* Forgot password */}
+            <div className="text-right text-sm">
+              <Link
+                to="/forgot-password"
+                className="text-indigo-600 hover:text-indigo-500 dark:text-teal-300 dark:hover:text-teal-200 font-medium"
+              >
+                Forgot password?
+              </Link>
+            </div>
+
+            {/* Sign In button */}
             <Button
               type="submit"
-              className="w-full h-11 bg-blue-600 hover:bg-blue-700 text-white font-medium"
+              className="w-full h-12 font-bold rounded-lg bg-indigo-600 hover:bg-indigo-700 dark:bg-teal-500 dark:hover:bg-teal-600 text-white flex items-center justify-center transition"
               disabled={isLoading}
             >
               {isLoading ? (
-                <div className="flex items-center gap-2">
-                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                  Signing in...
-                </div>
+                <>
+                  <Spinner />
+                  <span className="ml-2">Signing in...</span>
+                </>
               ) : (
-                'Sign in'
+                'Sign In'
               )}
             </Button>
           </form>
-          <div className="mt-6 text-center text-sm">
-            <span className="text-gray-600 dark:text-gray-400">
-              Don't have an account?{' '}
-            </span>
+
+          {/* Sign up link */}
+          <div className="mt-6 text-center text-sm text-gray-600 dark:text-gray-400">
+            Don’t have an account?{' '}
             <Link
               to="/signup"
-              className="text-blue-600 hover:text-blue-500 dark:text-blue-400 font-medium"
+              className="text-indigo-600 hover:text-indigo-500 dark:text-teal-300 font-medium"
             >
               Sign up
             </Link>
           </div>
         </CardContent>
-      </Card>
+      </div>
     </div>
   );
-};
-
-export default LoginPage;
+}

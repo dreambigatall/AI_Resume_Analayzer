@@ -1,25 +1,35 @@
+
 // src/components/CandidateList.tsx
 import { useEffect, useState, useCallback } from 'react';
 import resumeService from '@/services/resumeService';
-import type { Candidate, GeminiEducation } from '@/types'; // Ensure Candidate type is correct
+import type { Candidate, GeminiEducation } from '@/types';
 import {
-  Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow
-} from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
 import {
-  Accordion, AccordionContent, AccordionItem, AccordionTrigger
-} from "@/components/ui/accordion";
-import { Progress } from "@/components/ui/progress";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Star, AlertCircle, RefreshCcw, Loader2 } from 'lucide-react';
-import { Button } from './ui/button';
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
+import { Progress } from '@/components/ui/progress';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Star, AlertCircle, RefreshCcw, Loader2, ChevronDown } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface CandidateListProps {
   jobId: string;
-  refreshTrigger: number; // A prop to trigger re-fetch from parent
+  refreshTrigger: number;
 }
 
-const CandidateList = ({ jobId, refreshTrigger }: CandidateListProps) => {
+export default function CandidateList({ jobId, refreshTrigger }: CandidateListProps) {
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -32,8 +42,8 @@ const CandidateList = ({ jobId, refreshTrigger }: CandidateListProps) => {
       const data = await resumeService.getCandidatesForJob(jobId);
       setCandidates(data);
     } catch (err: any) {
-      console.error("Failed to fetch candidates:", err);
-      setError(err.message || "Could not load candidates.");
+      console.error('Failed to fetch candidates:', err);
+      setError(err.message || 'Could not load candidates.');
     } finally {
       setIsLoading(false);
     }
@@ -41,16 +51,18 @@ const CandidateList = ({ jobId, refreshTrigger }: CandidateListProps) => {
 
   useEffect(() => {
     fetchCandidates();
-  }, [fetchCandidates, refreshTrigger]); // Re-fetch when jobId or refreshTrigger changes
+  }, [fetchCandidates, refreshTrigger]);
 
-  const renderEducation = (educationArray?: GeminiEducation[]) => {
-    if (!educationArray || educationArray.length === 0) return <span className="text-muted-foreground italic">Not specified</span>;
+  const renderEducation = (edus?: GeminiEducation[]) => {
+    if (!edus?.length) {
+      return <span className="italic text-gray-500">Not specified</span>;
+    }
     return (
-      <ul className="list-disc list-inside space-y-1">
-        {educationArray.map((edu, index) => (
-          <li key={index} className="text-sm">
-            {edu.degree || 'Degree not specified'} at {edu.institution || 'Institution not specified'}
-            {edu.graduationYear && ` (Graduated: ${edu.graduationYear})`}
+      <ul className="list-disc list-inside space-y-0.5 text-sm">
+        {edus.map((e, i) => (
+          <li key={i}>
+            <strong>{e.degree || '–'}</strong> at {e.institution || '–'}
+            {e.graduationYear && ` (’${String(e.graduationYear).slice(-2)})`}
           </li>
         ))}
       </ul>
@@ -59,131 +71,168 @@ const CandidateList = ({ jobId, refreshTrigger }: CandidateListProps) => {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center py-8">
-        <Loader2 className="h-6 w-6 animate-spin text-primary" />
-        <span className="ml-2">Loading candidates...</span>
+      <div className="py-8">
+        <div className="flex items-center justify-center space-x-2">
+          <Loader2 className="h-6 w-6 animate-spin text-violet-600" />
+          <span className="text-gray-500">Loading candidates...</span>
+        </div>
+        <div className="mt-4 space-y-2">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="h-12 bg-gray-200 rounded animate-pulse" />
+          ))}
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <Alert variant="destructive" className="my-4">
-        <AlertCircle className="h-4 w-4" />
-        <AlertTitle>Error Loading Candidates</AlertTitle>
-        <AlertDescription>
-          {error}
-          <Button variant="outline" size="sm" onClick={fetchCandidates} className="ml-4">
-            <RefreshCcw className="mr-2 h-3 w-3" /> Try Again
-          </Button>
-        </AlertDescription>
+      <Alert variant="destructive" className="my-4 flex items-start space-x-2">
+        <AlertCircle className="h-5 w-5 text-red-500" />
+        <div>
+          <AlertTitle>Error Loading Candidates</AlertTitle>
+          <AlertDescription className="flex items-center space-x-2">
+            <span>{error}</span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={fetchCandidates}
+              className="flex items-center"
+            >
+              <RefreshCcw className="mr-1 h-4 w-4" /> Retry
+            </Button>
+          </AlertDescription>
+        </div>
       </Alert>
     );
   }
 
-  if (candidates.length === 0) {
+  if (!candidates.length) {
     return (
-      <div className="text-center py-8 text-muted-foreground">
-        <p>No candidates have been analyzed for this job yet.</p>
-        <p className="text-sm">Upload resumes to see analysis results here.</p>
+      <div className="text-center py-8 text-gray-500">
+        <p>No candidates analyzed yet.</p>
+        <p className="text-sm">Upload resumes to see them here.</p>
       </div>
     );
   }
 
   return (
     <div className="space-y-4">
-       <div className="flex justify-end">
-            <Button variant="outline" size="sm" onClick={fetchCandidates} disabled={isLoading}>
-                <RefreshCcw className={`mr-2 h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
-                Refresh List
-            </Button>
-        </div>
-      <Table>
-        <TableCaption className="mt-4">A list of analyzed candidates for this job.</TableCaption>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-[50px]">Rank</TableHead>
-            <TableHead className="w-[50px] text-center">Flag</TableHead>
-            <TableHead>Score</TableHead>
-            <TableHead>Years Exp.</TableHead>
-            <TableHead>Key Skills</TableHead>
-            <TableHead className="text-right">Details</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {candidates.map((candidate, index) => (
-            <TableRow key={candidate.candidateId}>
-              <TableCell className="font-medium">{index + 1}</TableCell>
-              <TableCell className="text-center">
-                {candidate.isFlagged && <Star className="h-5 w-5 text-yellow-500 fill-yellow-400" />}
-              </TableCell>
-              <TableCell>
-                <div className="flex items-center space-x-2">
-                  <span className="font-semibold">{candidate.score}/10</span>
-                  <Progress value={candidate.score * 10} className="w-20 h-2" />
-                </div>
-              </TableCell>
-              <TableCell>{candidate.yearsExperience || 'N/A'}</TableCell>
-              <TableCell>
-                <div className="flex flex-wrap gap-1 max-w-xs">
-                  {(candidate.skills?.slice(0, 5) || []).map((skill, i) => ( // Show first 5 skills
-                    <Badge key={i} variant="secondary">{skill}</Badge>
-                  ))}
-                  {candidate.skills && candidate.skills.length > 5 && (
-                    <Badge variant="outline">+{candidate.skills.length - 5} more</Badge>
-                  )}
-                </div>
-              </TableCell>
-              <TableCell className="text-right">
-                <Accordion type="single" collapsible className="w-full">
-                  <AccordionItem value={`item-${candidate.candidateId}`} className="border-none">
-                    <AccordionTrigger className="p-2 hover:no-underline [&[data-state=open]>svg]:rotate-180">
-                        View Analysis
-                    </AccordionTrigger>
-                    <AccordionContent className="p-4 bg-muted/50 rounded-md mt-1 text-left">
-                      <div className="space-y-3">
+      <div className="flex justify-end">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={fetchCandidates}
+          disabled={isLoading}
+          className="flex items-center space-x-1"
+        >
+          <RefreshCcw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+          <span>Refresh</span>
+        </Button>
+      </div>
+
+      <div className="overflow-x-auto rounded-lg border border-gray-200">
+        <Accordion type="single" collapsible>
+          <Table>
+            <TableCaption className="mt-4">
+              Analyzed candidates for this job
+            </TableCaption>
+            <TableHeader className="bg-gray-50 sticky top-0">
+              <TableRow>
+                <TableHead className="w-[40px]">#</TableHead>
+                <TableHead className="w-[40px] text-center">★</TableHead>
+                <TableHead>Score</TableHead>
+                <TableHead>Exp.</TableHead>
+                <TableHead>Top Skills</TableHead>
+                <TableHead className="text-right">Details</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {candidates.map((c, i) => (
+                <TableRow
+                  key={c.candidateId}
+                  className="odd:bg-white even:bg-gray-50 hover:bg-gray-100 transition"
+                >
+                  <TableCell className="font-medium">{i + 1}</TableCell>
+                  <TableCell className="text-center">
+                    {c.isFlagged && (
+                      <Star className="h-5 w-5 text-yellow-500 fill-yellow-300" />
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center space-x-2">
+                      <span className="font-semibold">{c.score}/10</span>
+                      <Progress
+                        value={c.score * 10}
+                        className="w-24 h-2 bg-gray-200"
+                      />
+                    </div>
+                  </TableCell>
+                  <TableCell>{c.yearsExperience ?? '–'}</TableCell>
+                  <TableCell>
+                    <div className="flex flex-wrap gap-1 max-w-xs">
+                      {(c.skills ?? []).slice(0, 5).map((s, idx) => (
+                        <Badge key={idx} variant="default" className="text-xs">
+                          {s}
+                        </Badge>
+                      ))}
+                      {c.skills && c.skills.length > 5 && (
+                        <Badge variant="outline" className="text-xs">
+                          +{c.skills.length - 5}
+                        </Badge>
+                      )}
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <AccordionItem value={`cand-${c.candidateId}`}>
+                      <AccordionTrigger className="flex items-center justify-end space-x-1 text-violet-600 hover:text-violet-800">
+                        <span>View</span>
+                        <ChevronDown className="h-4 w-4 transition-transform data-[state=open]:-rotate-180" />
+                      </AccordionTrigger>
+                      <AccordionContent className="p-4 bg-gray-50 rounded-md text-left space-y-4 max-w-md mx-auto break-words whitespace-pre-wrap">
                         <div>
-                          <h4 className="font-semibold text-sm mb-1">Justification:</h4>
-                          <p className="text-sm text-muted-foreground">{candidate.justification || "No justification provided."}</p>
+                          <strong>Justification:</strong>
+                          <p className="mt-1">{c.justification || 'None.'}</p>
                         </div>
                         <div>
-                          <h4 className="font-semibold text-sm mb-1">Education:</h4>
-                          {renderEducation(candidate.education)}
+                          <strong>Education:</strong>
+                          <div className="mt-1">{renderEducation(c.education)}</div>
                         </div>
-                        {candidate.skills && candidate.skills.length > 0 && (
-                             <div>
-                                <h4 className="font-semibold text-sm mb-1">All Skills Mentioned:</h4>
-                                <div className="flex flex-wrap gap-1">
-                                    {candidate.skills.map((skill, i) => (
-                                        <Badge key={i} variant="outline">{skill}</Badge>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-                        {candidate.warnings && candidate.warnings.length > 0 && (
+                        {c.skills?.length ? (
                           <div>
-                            <h4 className="font-semibold text-sm mb-1 text-destructive">Warnings:</h4>
-                            <ul className="list-disc list-inside space-y-1 text-destructive text-sm">
-                              {candidate.warnings.map((warning, i) => (
-                                <li key={i}>{warning}</li>
+                            <strong>All Skills:</strong>
+                            <div className="mt-1 flex flex-wrap gap-1">
+                              {c.skills.map((s, j) => (
+                                <Badge key={j} variant="outline" className="text-xs">
+                                  {s}
+                                </Badge>
+                              ))}
+                            </div>
+                          </div>
+                        ) : null}
+                        {c.warnings?.length ? (
+                          <div className="text-red-600">
+                            <strong>Warnings:</strong>
+                            <ul className="list-disc list-inside mt-1 space-y-1 text-sm">
+                              {c.warnings.map((w, j) => (
+                                <li key={j}>{w}</li>
                               ))}
                             </ul>
                           </div>
-                        )}
-                         <p className="text-xs text-muted-foreground mt-2">
-                            File: {candidate.originalFilename}
+                        ) : null}
+                        <p className="mt-2 text-xs text-gray-500">
+                          File: {c.originalFilename}
                         </p>
-                      </div>
-                    </AccordionContent>
-                  </AccordionItem>
-                </Accordion>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+                      </AccordionContent>
+                    </AccordionItem>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </Accordion>
+      </div>
     </div>
   );
-};
+}
 
-export default CandidateList;
