@@ -1,4 +1,3 @@
-
 // src/pages/LoginPage.tsx
 import { useNavigate, Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -12,7 +11,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
-  Card,
   CardContent,
   CardDescription,
   CardHeader,
@@ -242,7 +240,7 @@ export default function LoginPage() {
 
           {/* Sign up link */}
           <div className="mt-6 text-center text-sm text-gray-600 dark:text-gray-400">
-            Don’t have an account?{' '}
+            Don't have an account?{' '}
             <Link
               to="/signup"
               className="text-indigo-600 hover:text-indigo-500 dark:text-teal-300 font-medium"

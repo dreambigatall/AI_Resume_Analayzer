@@ -1,5 +1,6 @@
 // src/contexts/AuthContext.tsx
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
+import type { ReactNode } from 'react';
 // import { Session, User } from '@supabase/supabase-js';
 import { type User } from '@supabase/supabase-js';
 import { type Session } from '@supabase/supabase-js';

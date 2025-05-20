@@ -2,7 +2,7 @@
 // ... (keep JobDescription, CreateJobData) ...
 
 export type JobDescription = {
-  id: string;
+  _id: string;
   title: string;
   descriptionText: string;
   mustHaveSkills?: string[];
@@ -45,12 +45,9 @@ export type ResumeUploadResponse = {
 }
 
 // Define the type first
-type CreateJobData = {
+export type CreateJobData = {
   title: string;
   descriptionText: string;
   mustHaveSkills?: string[]; // Array for API
   focusAreas?: string[];     // Array for API
 }
-
-// Then export it explicitly
-export { CreateJobData };

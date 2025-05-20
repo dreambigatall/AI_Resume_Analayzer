@@ -5,7 +5,6 @@ import type { JobFormData } from '../lib/validators';
 import { JobSchema } from '@/lib/validators'; // Make sure validators.ts has JobSchema
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label"; // This might not be needed if using shadcn/ui FormField with FormLabel
 import { Textarea } from "@/components/ui/textarea";
 import {
   Form,
@@ -19,21 +18,21 @@ import {
 import { Loader2 } from "lucide-react";
 
 interface JobFormProps {
-  onSubmit: (data: JobFormData) => Promise<void>; // Changed to JobFormData to match validator
+  onSubmit: (data: JobFormData) => Promise<void>;
   initialData?: Partial<JobFormData>;
   isLoading: boolean;
   submitButtonText?: string;
-  onCancel?: () => void; // Optional cancel handler for dialogs
+  onCancel?: () => void;
 }
 
-const JobForm = ({ onSubmit, initialData, isLoading, submitButtonText = "Submit", onCancel }: JobFormProps) => {
-  const form = useForm<JobFormData>({ // Use JobFormData type
-    resolver: zodResolver(JobSchema), // Use JobSchema
-    defaultValues: initialData || {
-      title: '',
-      descriptionText: '',
-      mustHaveSkills: initialData?.mustHaveSkills || '', // Keep as string for input
-      focusAreas: initialData?.focusAreas || '',     // Keep as string for input
+const JobForm = ({ onSubmit, initialData = {}, isLoading, submitButtonText = "Submit", onCancel }: JobFormProps) => {
+  const form = useForm<JobFormData>({
+    resolver: zodResolver(JobSchema),
+    defaultValues: {
+      title: initialData.title || '',
+      descriptionText: initialData.descriptionText || '',
+      mustHaveSkills: initialData.mustHaveSkills || '',
+      focusAreas: initialData.focusAreas || '',
     },
   });
 
