@@ -1,6 +1,6 @@
-
 // export default Layout;
-import { ReactNode, useState } from 'react'; // Added useState for mobile menu
+import { useState } from 'react';
+import type { ReactNode } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext'; // Assuming this path is correct
 import { Button } from '@/components/ui/button';
@@ -17,15 +17,12 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet"; // For mobile menu
 import {
   LogOut,
-  UserCircle,
   Briefcase,
   LogIn,
   UserPlus,
-  Menu, // Hamburger icon
-  XIcon, // Close icon for mobile menu
-  LayoutDashboard, // For a potential dashboard link
-  Settings, // For a potential settings link
-  FileText, // For the app logo
+  Menu,
+  XIcon,
+  FileText,
 } from "lucide-react";
 
 // Mock useAuth for standalone example (Remove in your actual project)

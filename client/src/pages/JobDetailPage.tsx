@@ -1,4 +1,3 @@
-
 import { useEffect, useState, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import jobService from '@/services/jobService'; // Assume this service exists
@@ -134,9 +133,9 @@ export default function JobDetailPage() {
               {job.title}
             </CardTitle>
           </div>
-          {job.companyName && ( // Display company name if available
+          {/* {job.companyName && ( // Display company name if available
             <p className="text-lg text-gray-600">{job.companyName} {job.location && `- ${job.location}`}</p>
-          )}
+          )} */}
           <CardDescription className="text-sm text-gray-500 pt-2 flex items-center">
             <CalendarDays className="mr-2 h-4 w-4" />
             Posted on:{' '}
@@ -215,7 +214,7 @@ export default function JobDetailPage() {
         </CardHeader>
         <CardContent>
           <ResumeUploadForm
-            jobId={job.id ?? job._id!} // Added non-null assertion assuming job is loaded
+            jobId={job._id}
             onUploadSuccess={handleResumeUploaded}
           />
         </CardContent>
