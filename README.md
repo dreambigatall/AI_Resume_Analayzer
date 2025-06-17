@@ -143,6 +143,21 @@ Don't forget to give the project a star! Thanks again!
 Khalid Mohammed - dreambigatall1@gmail.com
 
 Project Link: https://ai-resume-analayzer-1.onrender.com/
+
+
+
+![Screenshot 2025-06-17 210309](https://github.com/user-attachments/assets/2d2d5edb-b607-4313-b67c-75e42f9f72bd)
+![Screenshot 2025-06-17 210329](https://github.com/user-attachments/assets/6e933c39-e126-4b88-a4fb-c22bd4f5b55d)
+![Screenshot 2025-06-17 210350](https://github.com/user-attachments/assets/205d4765-da37-4fc7-9298-4ad861f5a1ee)
+![Screenshot 2025-06-17 210421](https://github.com/user-attachments/assets/2d815419-b9cd-440c-935b-7c6429a21bff)
+![Screenshot 2025-06-17 210450](https://github.com/user-attachments/assets/94ff8342-e28c-45c9-9e12-40ff94d8fae0)
+![Screenshot 2025-06-17 210503](https://github.com/user-attachments/assets/0d82b1df-e311-41f1-9610-a6bd947cc2b6)
+![Screenshot 2025-06-17 210516](https://github.com/user-attachments/assets/6a3814b0-219c-4ba5-8711-3235ec3fe28c)
+
+
+
+
+
 ```
 
 
@@ -150,11 +165,7 @@ Project Link: https://ai-resume-analayzer-1.onrender.com/
 
 
 
-![Screenshot 2025-06-17 210309](https://github.com/user-attachments/assets/2c87c310-f2ca-40f6-abcd-4403765c2842)
 
-![Screenshot 2025-06-17 210329](https://github.com/user-attachments/assets/75741a86-7f8c-4fda-b66b-06f9a517f2f1)
-![Screenshot 2025-06-17 210350](https://github.com/user-attachments/assets/7527585e-0b02-4a46-b2f8-b711a129fe8b)
-![Screenshot 2025-06-17 210421](https://github.com/user-attachments/assets/2f598345-a130-4888-8ace-71872974c3d9)
-![Screenshot 2025-06-17 210450](https://github.com/user-attachments/assets/8ef7850b-6e3b-45a1-a245-b8dbcd044b88)![Screenshot 2025-06-17 210503](https://github.com/user-attachments/assets/10a71c14-4251-46fa-b7e5-856e360f8214)
-![Screenshot 2025-06-17 210516](https://github.com/user-attachments/assets/32c0e91f-d60b-42c9-85b3-36257cf38609)
+
+
 
