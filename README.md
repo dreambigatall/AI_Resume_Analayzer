@@ -1,6 +1,6 @@
-Here's a comprehensive README for your GitHub project, designed to be informative and engaging for potential users and contributors:
 
-```markdown
+
+```
 # AI Resume Analyzer for Recruiters
 
 ## 🚀 Project Overview
